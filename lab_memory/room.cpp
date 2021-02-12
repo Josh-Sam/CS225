@@ -63,7 +63,7 @@ void Room::clear()
 {
     if (letters != NULL)
 
-        letters = NULL;
+        delete letters;
 }
 
 void Room::copy(const Room& other)
