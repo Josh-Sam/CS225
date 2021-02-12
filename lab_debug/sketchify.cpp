@@ -33,11 +33,20 @@ HSLAPixel* myFavoriteColor() {
     return &p;
 }
 
+void dummy(std::string str){
+  std::cout << str;
+}
+
 void sketchify(std::string inputFile, std::string outputFile) {
+
+    std::cout << outputFile << '\n';
     // Load in.png
     PNG* original;
 
     original->readFromFile(inputFile);
+
+    //std::cout << outputFile << '\n';
+
     unsigned width = original->width();
     unsigned height = original->height();
 
@@ -49,6 +58,7 @@ void sketchify(std::string inputFile, std::string outputFile) {
 
     // Go over the whole image, and if a pixel differs from that to its upper
     // left, color it my favorite color in the output
+
 
     for (unsigned y = 1; y < height; y++) {
 
@@ -72,7 +82,8 @@ void sketchify(std::string inputFile, std::string outputFile) {
 
     // Save the output file
 
-    output->writeToFile(outputFile);
+    output->writeToFile("out.png");
+
     // Clean up memory
     //delete myPixel;
     //delete output;
