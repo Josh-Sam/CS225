@@ -64,6 +64,7 @@ void Room::clear()
     if (letters != NULL)
 
         delete letters;
+        letters = new Letter[max_letters];
 }
 
 void Room::copy(const Room& other)
