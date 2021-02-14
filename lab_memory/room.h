@@ -45,7 +45,8 @@ class Room
      * Room copy constructor.
      * @param other The Room to copy into this room.
      */
-    Room(const Room& other); 
+
+    Room(const Room& other);
 
     /**
      * Main Room constructor.
