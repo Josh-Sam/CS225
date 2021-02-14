@@ -88,6 +88,7 @@ void Allocator::printRooms(std::ostream & stream /* = std::cout */)
     // Output the allocation
     stream << "Room Allocation (" << studentCount << "/" << totalCapacity << ")"
          << std::endl;
+    roomCount=fileio::getNumRooms();
     for (int i = 0; i < roomCount; i++)
         rooms[i].print(stream);
 }
@@ -107,6 +108,7 @@ int Allocator::solve()
 int Allocator::minSpaceRemaining()
 {
     int border = 1000000;
+    roomCount=fileio::getNumRooms();
     for (int i = 0; i < roomCount; i++)
         if (rooms[i].spaceRemaining() < border)
             border = rooms[i].spaceRemaining();
@@ -117,6 +119,7 @@ Room* Allocator::largestOpening()
 {
     int index = 0;
     int max_remaining = 0;
+    roomCount = fileio::getNumRooms();
     for (int i = 0; i < roomCount; i++) {
         if (rooms[i].spaceRemaining() > max_remaining) {
             index = i;
