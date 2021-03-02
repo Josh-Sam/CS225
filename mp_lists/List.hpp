@@ -174,6 +174,31 @@ void List<T>::tripleRotate() {
   temp->prev = temp2->next;
   temp2->next->next->prev = temp;
   temp2->next->next = temp;
+  while (temp->next != NULL) {
+    if (temp->next->next != NULL) {
+      if (temp->next->next->next != NULL) {
+        temp = temp->next;
+        temp -> prev -> next = temp->next;
+        temp2 = temp->next;
+        temp2->prev = temp->prev;
+        temp ->next = temp2->next->next;
+        temp->prev = temp2->next;
+        if (temp2 ->next->next != NULL) {
+          temp2->next->next->prev = temp;
+          temp2->next->next = temp;
+        }else{
+          temp2 ->next->next = temp;
+          tail_ = temp;
+        }
+
+      }else{
+        return;
+      }
+    }else{
+      return;
+    }
+
+  }
 
 }
 
