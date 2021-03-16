@@ -100,6 +100,15 @@ void KDTree<Dim>::destroy(){
   size=0;
   destroyHelper(root);
 }
+template <int Dim>
+void KDTree<Dim>::destroyHelper(typename KDTree<Dim>::KDTreeNode* subRoot){
+  if(subRoot==NULL)
+    return;
+  destroyHelper(subRoot->left);
+  destroyHelper(subRoot->right);
+  delete subRoot;
+  subRoot=NULL;
+}
 
 template <int Dim>
 Point<Dim> KDTree<Dim>::findNearestNeighbor(const Point<Dim>& query) const
