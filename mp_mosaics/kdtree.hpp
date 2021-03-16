@@ -15,14 +15,12 @@ bool KDTree<Dim>::smallerDimVal(const Point<Dim>& first,
     /**
      * @todo Implement this function!
      */
-     if(first[curDim]>second[curDim])
+    if(first[curDim]>second[curDim])
       return false;
     else if(first[curDim]==second[curDim])
       return (first<second);
     else
       return true;
-
-    return false;
 }
 
 template <int Dim>
@@ -33,17 +31,21 @@ bool KDTree<Dim>::shouldReplace(const Point<Dim>& target,
     /**
      * @todo Implement this function!
      */
-  int currentDistance= distance(target,currentBest);
-  int potentialDistance= distance(target,potential);
-  if(currentDistance<potentialDistance)
-  return false;
-  else if(potentialDistance<currentDistance)
-  return true;
-  else
-  return potential<currentBest;
-
-
+     int currentDistance= distance(target,currentBest);
+     int potentialDistance= distance(target,potential);
+     if(currentDistance<potentialDistance)
      return false;
+     else if(potentialDistance<currentDistance)
+     return true;
+     else
+     return potential<currentBest;
+}
+template<int Dim>
+int KDTree<Dim>::distance(const Point<Dim>& target,const Point<Dim>& query)const {
+  int dist=0;
+  for(int i=0;i< Dim;i++)
+    dist+=(target[i]-query[i])*(target[i]-query[i]);
+  return dist;
 }
 
 template <int Dim>
@@ -52,16 +54,65 @@ KDTree<Dim>::KDTree(const vector<Point<Dim>>& newPoints)
     /**
      * @todo Implement this function!
      */
-     size=newPoints.size();
- if(size==0)
-   root=NULL;
- else{
-   for(const Point<Dim>& i: newPoints){
-     treepoints.push_back(i);
-   }
-   root= build(0,size-1,0);
- }
+  size=newPoints.size();
+  if(size==0)
+    root=NULL;
+  else{
+    for(const Point<Dim>& i: newPoints){
+      treepoints.push_back(i);
+    }
+    root= build(0,size-1,0);
+  }
+
 }
+template <int Dim>
+typename KDTree<Dim>::KDTreeNode * KDTree<Dim>::build(int begin, int end,int currentDim){
+  if(begin>end)
+    return NULL;
+  else if(begin==end)
+    return new KDTreeNode(treepoints[begin]);
+  else{
+    int pivotIndex=(begin+end)/2;
+    int nextDim=(currentDim+1)%Dim;
+    quickSelect(begin,end,pivotIndex,currentDim);
+
+    KDTreeNode *  currentRoot= new KDTreeNode(treepoints[pivotIndex]);
+    currentRoot->left = build(begin,(pivotIndex-1), nextDim);
+    currentRoot->right = build((pivotIndex+1), end, nextDim);
+
+    return currentRoot;
+  }
+}
+
+template <int Dim>
+void KDTree<Dim>::quickSelect(int begin, int end, int pivotIndex, int currentDim) {
+  while(begin!=end){
+    Point<Dim> pivotPoint=treepoints[pivotIndex];
+    treepoints[pivotIndex]=treepoints[end];
+    treepoints[end]=pivotPoint;
+    int storeIndex=begin;
+    for(int i=begin;i<end;i++){
+      if(smallerDimVal(treepoints[i],pivotPoint,currentDim) || treepoints[i]==pivotPoint){
+        Point<Dim> temp=treepoints[storeIndex];
+        treepoints[storeIndex]=treepoints[i];
+        treepoints[i]=temp;
+        storeIndex++;
+      }
+    }
+    Point<Dim> temp=treepoints[storeIndex];
+    treepoints[storeIndex]=treepoints[end];
+    treepoints[end]=temp;
+    if(storeIndex==pivotIndex)
+      return;
+    else if (pivotIndex < storeIndex)
+      end = storeIndex-1;
+    else
+      begin = storeIndex+1;
+  }
+}
+
+
+
 
 template <int Dim>
 KDTree<Dim>::KDTree(const KDTree<Dim>& other) {
@@ -73,7 +124,7 @@ KDTree<Dim>::KDTree(const KDTree<Dim>& other) {
 
 template <int Dim>
 void KDTree<Dim>::copy(const KDTree<Dim>& other){
-this=new KDTree(other.treepoints);
+  this=new KDTree(other.treepoints);
 }
 
 template <int Dim>
@@ -82,7 +133,6 @@ const KDTree<Dim>& KDTree<Dim>::operator=(const KDTree<Dim>& rhs) {
    * @todo Implement this function!
    */
 
-  return *this;
 }
 
 template <int Dim>
@@ -100,6 +150,7 @@ void KDTree<Dim>::destroy(){
   size=0;
   destroyHelper(root);
 }
+
 template <int Dim>
 void KDTree<Dim>::destroyHelper(typename KDTree<Dim>::KDTreeNode* subRoot){
   if(subRoot==NULL)
@@ -116,8 +167,10 @@ Point<Dim> KDTree<Dim>::findNearestNeighbor(const Point<Dim>& query) const
     /**
      * @todo Implement this function!
      */
-     return findNearestNeighbor(query,root,0);
+
+    return findNearestNeighbor(query,root,0);
 }
+
 template <int Dim>
 Point<Dim> KDTree<Dim>::findNearestNeighbor(const Point<Dim>& query,typename KDTree<Dim>::KDTreeNode* currentNode, int currentDim) const{
   if(currentNode->left==NULL && currentNode->right==NULL)
