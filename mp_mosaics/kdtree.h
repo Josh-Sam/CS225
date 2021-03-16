@@ -248,7 +248,7 @@ class KDTree
     /** Internal representation, root and size **/
     KDTreeNode *root;
     size_t size;
-
+    vector<Point<Dim>> treepoints;
     /** Helper function for grading */
     int getPrintData(KDTreeNode * subroot) const;
 
@@ -259,6 +259,10 @@ class KDTree
     /**
      * @todo Add your helper functions here.
      */
+     int distance(const Point<Dim>& target,const Point<Dim>& query)const;
+     typename KDTree<Dim>::KDTreeNode * build(int begin, int end,int currentDim);
+     void copy(const KDTree<Dim>& other);
+     Point<Dim> findNearestNeighbor(const Point<Dim>& query,typename KDTree<Dim>::KDTreeNode* currentNode, int currentDim) const;
 };
 
 #include "kdtree.hpp"
