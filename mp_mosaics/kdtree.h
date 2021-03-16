@@ -261,9 +261,11 @@ class KDTree
      */
      int distance(const Point<Dim>& target,const Point<Dim>& query)const;
      typename KDTree<Dim>::KDTreeNode * build(int begin, int end,int currentDim);
-     void copy(const KDTree<Dim>& other);
+     void quickSelect(int begin, int end, int pivotIndex, int currentDim);
      Point<Dim> findNearestNeighbor(const Point<Dim>& query,typename KDTree<Dim>::KDTreeNode* currentNode, int currentDim) const;
-};
+     void copy(const KDTree<Dim>& other);
+     void destroy();
+     void destroyHelper(typename KDTree<Dim>::KDTreeNode* subRoot);};
 
 #include "kdtree.hpp"
 #include "kdtree_extras.hpp"

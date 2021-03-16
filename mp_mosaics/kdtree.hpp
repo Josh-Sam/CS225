@@ -90,6 +90,15 @@ KDTree<Dim>::~KDTree() {
   /**
    * @todo Implement this function!
    */
+   destroy();
+}
+
+template <int Dim>
+void KDTree<Dim>::destroy(){
+  for(size_t i=0;i<size;i++)
+    treepoints.pop_back();
+  size=0;
+  destroyHelper(root);
 }
 
 template <int Dim>
