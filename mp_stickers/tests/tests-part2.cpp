@@ -25,12 +25,12 @@ TEST_CASE("A basic StickerSheet works", "[weight=5][part=2][timeout=30000][valgr
 
   Image expected;
   expected.readFromFile("tests/expected.png");
-
   REQUIRE( sheet.render() == expected );
 }
 
 
 TEST_CASE("StickerSheet::changeMaxStickers() does not discard stickers when resized larger", "[weight=1][part=2][timeout=30000][valgrind]") {
+
   Image alma; alma.readFromFile("tests/alma.png");
   Image i;    i.readFromFile("tests/i.png");
 
@@ -38,11 +38,12 @@ TEST_CASE("StickerSheet::changeMaxStickers() does not discard stickers when resi
   sheet.addSticker(i, 20, 200);
 
   sheet.changeMaxStickers(7);
+  sheet.render();
 
   Image expected;
   expected.readFromFile("tests/expected.png");
-
   REQUIRE( sheet.render() == expected );
+
 }
 
 TEST_CASE("StickerSheet::changeMaxStickers() does not discard original stickers when resized smaller", "[weight=1][part=2][timeout=30000][valgrind]") {
@@ -332,4 +333,3 @@ TEST_CASE("A Stickersheet with stickers placed beyond base image boundaries work
 
   REQUIRE( sheet.render() == alma );
 }
-

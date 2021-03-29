@@ -126,11 +126,12 @@ void Image::rotateColor(double degrees){
   for (unsigned x = 0; x < width(); x++) {
     for (unsigned y = 0; y < height(); y++) {
       HSLAPixel & pixel = getPixel(x, y);
-      if (pixel.h + degrees > 360.0) {
-        pixel.h = (pixel.h + degrees) - 360.0;
-      } else {
-        pixel.h = pixel.h + degrees;
+      int result = pixel.h + degrees;
+
+      while (result < 0) {
+        result += 360;
       }
+      pixel.h = result%360;
     }
   }
 }
@@ -147,30 +148,33 @@ void Image::illinify(){
     }
   }
 }
-void Image::scale(unsigned w, unsigned h){
-  PNG* scaled = new PNG(w, h);
-
-  for (unsigned int x = 0; x < w; x++){
-    for (unsigned int y = 0; y < h; y++){
-      HSLAPixel & pixel = scaled->getPixel(x, y);
-      unsigned int newX = (unsigned int) (width() * x / w);
-      unsigned int newY = (unsigned int) (height() * y / h);
-      pixel = getPixel(newX, newY);
-    }
-  }
-
-  resize(w, h);
-  for (unsigned int x = 0; x < w; x++){
-    for (unsigned int y = 0; y < h; y++){
-      HSLAPixel & pixel2 = scaled->getPixel(x, y);
-      HSLAPixel & pixel = getPixel(x, y);
-      pixel = pixel2;
-    }
-  }
-delete scaled;
-}
 
 void Image::scale(double factor){
-  scale(width()*factor, height()*factor);
+  if (factor > 1) {
+    resize(width() * factor, height() * factor);
+      for (int x = width() - 1; x >= 0; x--) {
+        for (int y = height() - 1; y >= 0; y--) {
+          HSLAPixel & p = getPixel((unsigned)x, (unsigned)y);
+          HSLAPixel & p2 = getPixel((unsigned)x / factor, (unsigned)y / factor);
+          p = p2;
+        }
+      }
+  }
+  if (factor < 1) {
+    for (unsigned x = 0; x < width() * factor; x++) {
+      for (unsigned y = 0; y < height() * factor; y++) {
+        HSLAPixel & p = getPixel(x, y);
+        HSLAPixel & p2 = getPixel(x / factor, y / factor);
+        p = p2;
+      }
+    }
+    resize(width() * factor, height() * factor);
+  }
+}
 
+void Image::scale(unsigned w, unsigned h){
+  double widthFactor = (double) w / (double) width();
+  double heightFactor = (double) h / (double) height();
+  double factor = std::min(widthFactor, heightFactor);
+  scale(factor);
 }

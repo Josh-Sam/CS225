@@ -8,7 +8,7 @@
 #include "cs225/PNG.h"
 using namespace cs225;
 
-class Image : public PNG{
+class Image : public cs225::PNG{
 public:
   void lighten();
 
