@@ -30,6 +30,13 @@ void AVLTree<K, V>::rotateLeft(Node*& t)
 {
     functionCalls.push_back("rotateLeft"); // Stores the rotation name (don't remove this)
     // your code here
+    Node * right = t->right;
+    Node * temp = right->left;
+    t->right = temp;
+    right ->left = t;
+    t->height=std::max(heightOrNeg1(t->left),heightOrNeg1(t->right))+1;
+    t =right;
+    t->height=std::max(heightOrNeg1(t->left),heightOrNeg1(t->right))+1;
 }
 
 template <class K, class V>
@@ -46,6 +53,13 @@ void AVLTree<K, V>::rotateRight(Node*& t)
 {
     functionCalls.push_back("rotateRight"); // Stores the rotation name (don't remove this)
     // your code here
+    Node * left = t->left;
+   Node * temp = left->right;
+   t->left = temp;
+   left ->right = t;
+   t->height=std::max(heightOrNeg1(t->left),heightOrNeg1(t->right))+1;
+   t =left;
+   t->height=std::max(heightOrNeg1(t->left),heightOrNeg1(t->right))+1;
 }
 
 template <class K, class V>
@@ -53,12 +67,38 @@ void AVLTree<K, V>::rotateRightLeft(Node*& t)
 {
     functionCalls.push_back("rotateRightLeft"); // Stores the rotation name (don't remove this)
     // your code here
+    rotateRight(t->right);
+    rotateLeft(t);
 }
 
 template <class K, class V>
 void AVLTree<K, V>::rebalance(Node*& subtree)
 {
     // your code here
+    if(subtree == NULL)
+  {
+    return;
+  }
+  int bfactor = (heightOrNeg1(subtree->left)-heightOrNeg1(subtree->right));//+1
+  if(bfactor == -2)
+  {
+    int rFactor = (heightOrNeg1(subtree->right->left)-heightOrNeg1(subtree->right->right));//+1
+    if (rFactor == -1) {
+      rotateLeft(subtree);
+    } else {
+      rotateRightLeft(subtree);
+    }
+  }
+  if(bfactor == 2)
+  {
+    int lFactor = (heightOrNeg1(subtree->left->left)-heightOrNeg1(subtree->left->right));//+1
+    if (lFactor == 1) {
+      rotateRight(subtree);
+    } else {
+      rotateLeftRight(subtree);
+    }
+  }
+  subtree->height =std::max(heightOrNeg1(subtree->left),heightOrNeg1(subtree->right))+1;
 }
 
 template <class K, class V>
@@ -71,6 +111,22 @@ template <class K, class V>
 void AVLTree<K, V>::insert(Node*& subtree, const K& key, const V& value)
 {
     // your code here
+    if (subtree==NULL)
+  {
+      subtree = new Node(key, value);
+  }
+
+  else if (key < subtree->key)
+  {
+    insert(subtree->left, key, value);
+  }
+
+  else if (key >=subtree->key)
+  {
+    insert(subtree->right, key, value);
+  }
+
+  rebalance(subtree);
 }
 
 template <class K, class V>
@@ -82,24 +138,57 @@ void AVLTree<K, V>::remove(const K& key)
 template <class K, class V>
 void AVLTree<K, V>::remove(Node*& subtree, const K& key)
 {
-    if (subtree == NULL)
-        return;
+  if (subtree == NULL)
+     return;
 
-    if (key < subtree->key) {
-        // your code here
-    } else if (key > subtree->key) {
-        // your code here
-    } else {
-        if (subtree->left == NULL && subtree->right == NULL) {
-            /* no-child remove */
-            // your code here
-        } else if (subtree->left != NULL && subtree->right != NULL) {
-            /* two-child remove */
-            // your code here
-        } else {
-            /* one-child remove */
-            // your code here
-        }
-        // your code here
-    }
+ if (key < subtree->key) {
+     // your code here
+     remove(subtree->left,key);
+ } else if (key > subtree->key) {
+     // your code here
+     remove(subtree->right,key);
+ } else {
+     if (subtree->left == NULL && subtree->right == NULL) {
+         /* no-child remove */
+         // your code here
+         //delete current node;
+         subtree->right = NULL;
+         subtree->left = NULL;
+         delete subtree;
+         subtree=NULL;
+     } else if (subtree->left != NULL && subtree->right != NULL) {
+         /* two-child remove */
+         // your code here
+         //iop = rightmost node of left subtree.
+         Node* temp = subtree->left;
+         while (temp->right!=NULL)
+         {
+           temp = temp->right;
+         }
+         swap(subtree, temp);
+         remove(subtree->left, key);
+     } else {
+         /* one-child remove */
+         // your code here
+         Node * right = subtree->right;
+         Node * left = subtree->left;
+         if(left!=NULL)
+         {
+           delete subtree;
+           subtree =left;
+         }
+         else if(right!=NULL)
+         {
+           delete subtree;
+           subtree = right;
+         }
+         else
+         {
+           delete subtree;
+           subtree=NULL;
+         }
+     }
+     // your code here
+ }
+ rebalance(subtree);
 }
