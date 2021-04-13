@@ -1,4 +1,3 @@
-
 #include <iterator>
 #include <cmath>
 
@@ -25,6 +24,7 @@
  */
 DFS::DFS(const PNG & png, const Point & start, double tolerance) {
   /** @todo [Part 1] */
+  //stack_=NULL;
   png_=png;
   start_=start;
   tol_=tolerance;
@@ -64,6 +64,7 @@ Point DFS::pop() {
   Point temp = stack_.top();
   stack_.pop();
   return temp;
+  //return Point(0, 0);
 }
 
 /**
@@ -72,6 +73,7 @@ Point DFS::pop() {
 Point DFS::peek() const {
   /** @todo [Part 1] */
   return stack_.top();
+  //return Point(0, 0);
 }
 
 /**
@@ -80,4 +82,5 @@ Point DFS::peek() const {
 bool DFS::empty() const {
   /** @todo [Part 1] */
   return stack_.empty();
+  //return true;
 }

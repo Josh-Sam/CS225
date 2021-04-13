@@ -21,6 +21,7 @@ double ImageTraversal::calculateDelta(const HSLAPixel & p1, const HSLAPixel & p2
   double s = p1.s - p2.s;
   double l = p1.l - p2.l;
 
+  // Handle the case where we found the bigger angle between two hues:
   if (h > 180) { h = 360 - h; }
   h /= 360;
 
@@ -33,12 +34,17 @@ double ImageTraversal::calculateDelta(const HSLAPixel & p1, const HSLAPixel & p2
 ImageTraversal::Iterator::Iterator() {
   /** @todo [Part 1] */
   t=NULL;
-
+  //start_=NULL;
+  //pos_=NULL;
+  //base_=NULL;
+  //tol_=0;
+  //pointsV=NULL;
+  //path_=NULL;
   unsigned int width = 0;
   unsigned int height = 0;
   unsigned int aw= base_.width();
   unsigned int ah = base_.height();
-
+  //std::cout<<"hi";
   pointsV.resize(aw,std::vector<bool>(ah));
   while(width<aw)
   {
@@ -69,11 +75,20 @@ bool ImageTraversal::Iterator::isAllowed(Point p)
     }
   }
   return false;
-
+  /*HSLAPixel & begin = base_.getPixel(start_.x,start_.y);
+  HSLAPixel & position = base_.getPixel(pos_.x,pos_.y);
+  if(calculateDelta(begin,position)<tol_)
+  {
+    if(pointsV[temp.x][temp.y]==false)
+    {
+      return true;
+    }
+  }
+  return false*/
 }
 
 ImageTraversal::Iterator::Iterator(ImageTraversal* imaget,PNG png, Point p, double d)
-{
+{//std::cout<<"hi";
   t = imaget;
   base_ = png;
   start_=p;
@@ -83,6 +98,7 @@ ImageTraversal::Iterator::Iterator(ImageTraversal* imaget,PNG png, Point p, doub
   unsigned int height = 0;
   unsigned int aw= base_.width();
   unsigned int ah = base_.height();
+  //std::cout<<"hi";
   pointsV.resize(aw,std::vector<bool>(ah));
   while(width<aw)
   {
@@ -94,9 +110,11 @@ ImageTraversal::Iterator::Iterator(ImageTraversal* imaget,PNG png, Point p, doub
     }
     width++;
   }
+  //std::cout<<"hi";
 
   if(!isAllowed(pos_)==false)
   {
+    //pointsV[base_.widht()*pos_.y+pos_.x]=true;
     pointsV[pos_.x][pos_.y]=true;
   }
 
@@ -109,6 +127,7 @@ ImageTraversal::Iterator::Iterator(ImageTraversal* imaget,PNG png, Point p, doub
 ImageTraversal::Iterator & ImageTraversal::Iterator::operator++() {
   /** @todo [Part 1] */
   pointsV[pos_.x][pos_.y]=true;
+  //int increment = 1;
   Point right, left, above, below;
   right = Point(pos_.x+1,pos_.y);
   left = Point(pos_.x-1,pos_.y);
@@ -158,6 +177,21 @@ Point ImageTraversal::Iterator::operator*() {
 bool ImageTraversal::Iterator::operator!=(const ImageTraversal::Iterator &other) {
   /** @todo [Part 1] */
 
+  //return false;
+  /*if(t==NULL && other.t==NULL)
+  {
+    return false;
+  }
+  else if(t!=NULL && other.t!=NULL)
+  {
+    if(t->empty()!=true && other.t->empty()!=true)
+    {
+      return (t!=other.t);
+    }
+  }
+  else if(t->e)
+  return true;*/
+  //TAKEN DIRECTLY FROM Lab_trees/TreeTraversals
   bool thisEmpty = false;
   bool otherEmpty = false;
 
@@ -167,7 +201,7 @@ bool ImageTraversal::Iterator::operator!=(const ImageTraversal::Iterator &other)
   if (!thisEmpty)  { thisEmpty = t->empty(); }
   if (!otherEmpty) { otherEmpty = other.t->empty(); }
 
-  if (thisEmpty && otherEmpty) return false;
-  else if ((!thisEmpty)&&(!otherEmpty)) return (t != other.t);
-  else return true;
+  if (thisEmpty && otherEmpty) return false; // both empty then the ts are equal, return true
+  else if ((!thisEmpty)&&(!otherEmpty)) return (t != other.t); //both not empty then compare the traversals
+  else return true; // one is empty while the other is not, return true
 }

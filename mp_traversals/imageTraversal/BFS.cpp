@@ -25,9 +25,9 @@ using namespace cs225;
 BFS::BFS(const PNG & png, const Point & start, double tolerance) {
   /** @todo [Part 1] */
   png_=png;
- start_=start;
- tol_=tolerance;
- stack_.push(start_);
+  start_=start;
+  tol_=tolerance;
+  stack_.push(start_);
 }
 
 /**
@@ -62,6 +62,7 @@ Point BFS::pop() {
   Point temp = stack_.front();
   stack_.pop();
   return temp;
+  //return Point(0, 0);
 }
 
 /**
@@ -70,6 +71,7 @@ Point BFS::pop() {
 Point BFS::peek() const {
   /** @todo [Part 1] */
   return stack_.front();
+  //return Point(0, 0);
 }
 
 /**
@@ -78,4 +80,5 @@ Point BFS::peek() const {
 bool BFS::empty() const {
   /** @todo [Part 1] */
   return stack_.empty();
+  //return true;
 }
