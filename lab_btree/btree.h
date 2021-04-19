@@ -3,6 +3,9 @@
  * Definition of a B-tree class which can be used as a generic dictionary
  * (insert-only). Designed to take advantage of caching to be faster than
  * standard balanced binary search trees.
+ *
+ * @author Matt Joras
+ * @date Winter 2013
  */
 
 #pragma once
@@ -338,12 +341,30 @@ class BTree
  * the sorted order of elements. If val occurs in elements, then this returns
  * the index of val in elements.
  */
+
+using namespace std;
+
+template <class T, class C>
+size_t bin_search(const std::vector<T>& elements, const C& val, unsigned start, unsigned end)
+{
+	if (end - start == 0) {
+		return (val > elements[end]) ? end + 1 : end;
+	}
+	unsigned int middle = ((end + start) / 2);
+	if (elements[middle] > val) {
+		return bin_search(elements, val, 0, middle);
+	}
+	if (elements[middle] < val) {
+		return bin_search(elements, val, middle + 1, end);
+	}
+	else {return middle;}
+}
+
 template <class T, class C>
 size_t insertion_idx(const std::vector<T>& elements, const C& val)
 {
-    /* TODO Your code goes here! */
-
-    return 5;
+	if (elements.size() == 0) return 0;
+	return bin_search(elements, val, 0, elements.size() - 1);
 }
 
 #include "btree_given.cpp"
