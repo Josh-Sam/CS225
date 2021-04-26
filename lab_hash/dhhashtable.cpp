@@ -160,7 +160,7 @@ void DHHashTable<K, V>::resizeTable()
             size_t h = hashes::hash(table[slot]->first, newSize);
             size_t jump = hashes::secondary_hash(table[slot]->first, newSize);
             size_t i = 0;
-            size_t idx = h; 
+            size_t idx = h;
             while (temp[idx] != NULL)
             {
                 ++i;
