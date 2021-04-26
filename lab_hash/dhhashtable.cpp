@@ -1,3 +1,8 @@
+/**
+ * @file dhhashtable.cpp
+ * Implementation of the DHHashTable class.
+ */
+
 #include "dhhashtable.h"
 
 using hashes::hash;
