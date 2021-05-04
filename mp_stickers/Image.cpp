@@ -180,20 +180,12 @@ void Image::scale(double factor) {
 
 void Image::scale(unsigned x, unsigned y) {
 
-	Image * copyImage = new Image();
-	*copyImage = *this;
-	resize(x, y);
-
 	double xFactor = x / width();
 	double yFactor = y / height();
 
-	for (unsigned int h = 0; h < y; h++) {
-		for (unsigned int w = 0; w < x; w++) {
-			HSLAPixel & cur_pixel = getPixel(w, h);
-			HSLAPixel & cur_copy_pixel = copyImage->getPixel(w / xFactor, h / yFactor);
-			cur_pixel = cur_copy_pixel;
-		}
-	}
-
-	delete copyImage;
+  if (xFactor > yFactor) {
+    scale(yFactor);
+  } else {
+   scale(xFactor);
+}
 }
