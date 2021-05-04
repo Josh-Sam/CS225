@@ -1,176 +1,165 @@
 #include "StickerSheet.h"
-#include <cstdint>
-#include <iostream>
-#include "cs225/PNG.h"
 #include "cs225/HSLAPixel.h"
-#include <cmath>
-#include <cstdlib>
-#include "Image.h"
+#include <iostream>
 
 using namespace cs225;
-using namespace std;
 
-StickerSheet::StickerSheet(const Image &picture, unsigned newMax){
-    max = newMax;
-    index = 0;
-    tempImage = new Image(picture);
-    pic = new Image*[max];
-    xCoordinate = new int[max];
-    yCoordinate = new int[max];
-    for(unsigned i = 0; i < max; i++){
-      pic[i] = NULL;
-  }
-
+void StickerSheet::copy_(const StickerSheet & other) {
+	max_ = other.max_;
+	base = new Image(*(other.base));
+	num_stickers_ = other.num_stickers_;
+	Images = new Image * [max_];
+	XCoords = new unsigned[max_];
+	YCoords = new unsigned[max_];
+	for (unsigned i = 0; i < num_stickers_; i++) {
+		Images[i] = new Image();
+		*(Images[i]) = *(other.Images[i]);
+		XCoords[i] = other.XCoords[i];
+		YCoords[i] = other.YCoords[i];
+	}
 }
 
-StickerSheet::~StickerSheet(){
-  clear();
+void StickerSheet::clear_() {
+	for (unsigned i = 0; i < num_stickers_; i++) {
+		delete Images[i];
+		Images[i] = NULL;
+	}
+	delete base;
+	delete[] Images;
+	delete[] XCoords;
+	delete[] YCoords;
 }
 
-void StickerSheet::clear(){
-  for(unsigned i = 0; i < max; i++){
-    if(pic[i] != NULL){
-      delete pic[i];
-      pic[i] = NULL;
-    }
-  }
-  delete[] pic;
-  delete[] xCoordinate;
-  delete[] yCoordinate;
-  pic = NULL;
-  xCoordinate = NULL;
-  yCoordinate = NULL;
+StickerSheet::StickerSheet(const Image & picture, unsigned max) {
+	max_ = max;
+	num_stickers_ = 0;
+	Images = new Image * [max_];
+	XCoords = new unsigned[max_];
+	YCoords = new unsigned[max_];
+	base = new Image(picture);
+	XCoords[0] = 0; YCoords[0] = 0;
 }
 
-StickerSheet::StickerSheet(const StickerSheet & other){
-  copy(other);
+StickerSheet::~StickerSheet() {
+	clear_();
 }
 
-void StickerSheet::copy(const StickerSheet & other){
-  index = other.index;
-    max = other.max;
-    tempImage = new Image(*other.tempImage);
-    pic = new Image*[max];
-    xCoordinate = new int[max];
-    yCoordinate = new int[max];
-    for(unsigned i = 0; i < max; i++){
-      if(other.pic[i] != NULL)
-        pic[i] = new Image(*(other.pic[i]));
-      else
-        pic[i] = NULL;
-      xCoordinate[i] = other.xCoordinate[i];
-      yCoordinate[i] = other.yCoordinate[i];
-    }
+StickerSheet::StickerSheet(const StickerSheet & other) {
+	copy_(other);
 }
 
-const StickerSheet& StickerSheet::operator= (const StickerSheet & other){
-  if (this != &other){
-    clear();
-    copy(other);
-  }
-  return *this;
+const StickerSheet & StickerSheet::operator=(const StickerSheet & other) {
+	if (this != &other) {
+		clear_();
+		copy_(other);
+	}
+	return *this;
 }
 
+void StickerSheet::changeMaxStickers(unsigned max) {
+	//Image ** temp_images = new Image * [max_];
+	Image ** temp_images = new Image * [num_stickers_];
+	unsigned * temp_xc = new unsigned [num_stickers_];
+	unsigned * temp_yc = new unsigned [num_stickers_];
+	for (unsigned i = 0; i < num_stickers_; i++) {
+		temp_images[i] = Images[i];
+		temp_xc[i] = XCoords[i];
+		temp_yc[i] = YCoords[i];
+	}
+	delete[] Images;
+	delete[] XCoords;
+	delete[] YCoords;
+	Images = new Image * [max];
+	XCoords = new unsigned[max];
+	YCoords = new unsigned[max];
 
-void StickerSheet::changeMaxStickers(unsigned newMax){
-  if(newMax == max)
-      return;
-  if(newMax>max){
-    Image** newpic = new Image*[newMax];
-    for (unsigned i = 0; i < newMax; i++) {
-      newpic[i] = NULL;
-    }
-    int* newxCoordinate = new int[newMax];
-    int* newyCoordinate = new int[newMax];
-      for(unsigned i = 0; i < index; i++){
-        if(pic[i] != NULL){
-          newpic[i] = new Image(*pic[i]);
-          newxCoordinate[i] = xCoordinate[i];
-          newyCoordinate[i] = yCoordinate[i];
-        }
-      }
-    }
-    else{
-    for(unsigned i = newMax; i < max; i++){
-      removeSticker(i);
-    }
-}
-}
-int StickerSheet::addSticker(Image & sticker, unsigned x, unsigned y){
-  if(index < max){
-   for (unsigned i = 0; i < max; i++) {
-     if(pic[i] == NULL){
-       xCoordinate[i] = x;
-       yCoordinate[i] = y;
-       pic[i] = new Image(sticker);
-       index++;
-       return i;
-     }
-   }
- }
-   return -1;
-}
-
-bool StickerSheet::translate(unsigned index, unsigned x, unsigned y){
-  if(index < 1 || index >= max || pic[index] == NULL){
-    return false;
-  }
-  else{
-    xCoordinate[index] = x;
-    yCoordinate[index] = y;
-    return true;
-  }
+	if (max < num_stickers_) {
+		for (unsigned i = max; i < num_stickers_; i++) {
+			delete temp_images[i];
+			temp_images[i] = NULL;
+		}
+		num_stickers_ = max;
+		for (unsigned i = 0; i < num_stickers_; i++) {
+			Images[i] = temp_images[i];
+			XCoords[i] = temp_xc[i];
+			YCoords[i] = temp_yc[i];
+		}
+	}
+	else {
+		for (unsigned i = 0; i < num_stickers_; i++) {
+			Images[i] = temp_images[i];
+			XCoords[i] = temp_xc[i];
+			YCoords[i] = temp_yc[i];
+		}
+	}
+	max_ = max;
+	delete[] temp_images;
+	delete[] temp_xc;
+	delete[] temp_yc;
 }
 
-void StickerSheet::removeSticker(unsigned index){
-  if(index >= max || pic[index] == NULL){
-    return;
-  }
-  else{
-    delete pic[index];
-    pic[index] = NULL;
-    xCoordinate[index] = 0;
-    yCoordinate[index] = 0;
-  }
+int StickerSheet::addSticker(Image & sticker, unsigned x, unsigned y) {
+	for (unsigned i = 0; i < max_; i++) {
+		if (i == num_stickers_) {
+			Images[i] = new Image(sticker);
+			XCoords[i] = x;
+			YCoords[i] = y;
+			num_stickers_++;
+			return int(i);
+		}
+	}
+	return -1;
 }
 
-Image* StickerSheet::getSticker(unsigned index) const{
-if (index < max) return pic[index];
-else return NULL;
+bool StickerSheet::translate(unsigned index, unsigned x, unsigned y) {
+	if (index < num_stickers_) {
+		XCoords[index] = x;
+		YCoords[index] = y;
+		return true;
+	}
+	return false;
 }
 
-Image StickerSheet::render() const{
-  Image* base = new Image(*tempImage);
-    unsigned xMax = base->width();
-    unsigned yMax = base->height();
-    for (unsigned i = 0; i < index; i++) {
-      if(pic[i] != NULL){
-      unsigned x = xCoordinate[i] + pic[i]->width();
-      unsigned y = yCoordinate[i] + pic[i]->height();
-      if(x > xMax)
-        xMax = x;
-      if(y > yMax)
-        yMax = y;
-      }
-    }
-      base->resize(xMax, yMax);
+void StickerSheet::removeSticker(unsigned index) {
+	delete Images[index];
+	for (unsigned i = index; i < max_ - 1; i++) {
+		Images[i] = Images[i + 1];
+		XCoords[i] = XCoords[i + 1];
+		YCoords[i] = YCoords[i + 1];
+	}
+	Images[max_ - 1] = NULL;
+	XCoords[max_ - 1] = 0;
+	YCoords[max_ - 1] = 0;
+	num_stickers_--;
+}
 
-      for(unsigned i = 0; i < index; i++){
-        if(pic[i] != NULL){
-          for(unsigned x = xCoordinate[i]; x < xCoordinate[i] + pic[i]->width(); x++){
-            for (unsigned y = yCoordinate[i]; y < yCoordinate[i] + pic[i]->height(); y++) {
-              HSLAPixel basePixel = base->getPixel(x,y);
-              HSLAPixel pixel = pic[i]->getPixel(x - xCoordinate[i],y-yCoordinate[i]);
-              if(pixel.a != 0){
-                basePixel.h = pixel.h;
-                basePixel.s = pixel.s;
-                basePixel.l = pixel.l;
-                basePixel.a = pixel.a;
-              }
-            }
-          }
-        }
-      }
-  Image result = *base;
-  return result;
+Image * StickerSheet::getSticker(unsigned index) const {
+	if (index >= num_stickers_) {return NULL;}
+	return Images[index];
+}
+
+Image StickerSheet::render() const {
+	Image result(*base);
+	for (unsigned i = 0; i < num_stickers_; i++) {
+		unsigned curw = Images[i]->width();
+		unsigned curh = Images[i]->height();
+		// Resize image accordingly
+		if ((curw + XCoords[i]) > result.width()) {
+			result.resize(curw + XCoords[i], result.height());
+		}
+		if ((curh + YCoords[i]) > result.height()) {
+			result.resize(result.width(), curh + YCoords[i]);
+		}
+		// Overwrite necessary pixels
+		for (unsigned x = 0; x < curw; x++) {
+			for (unsigned y = 0; y < curh; y++) {
+				HSLAPixel & cur_result_pixel = result.getPixel(x + XCoords[i], y + YCoords[i]);
+				HSLAPixel & cur_image_pixel = Images[i]->getPixel(x, y);
+				if (cur_image_pixel.a != 0) {
+					cur_result_pixel = cur_image_pixel;
+				}
+			}
+		}
+	}
+	return result;
 }
